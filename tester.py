@@ -21,9 +21,9 @@ import string
 import subprocess
 import time
 import datetime
-import shlex
 
 errors = 0
+slow = 0
 
 t0 = datetime.datetime.now()
 
@@ -57,11 +57,26 @@ for i in range(num_tests):
 	return_status = process.poll()
 	total_seconds = round(tD.total_seconds(),3)
 	if (return_status != 0 or total_seconds > 10):
-		errors = errors + 1
+		type = ""
+		if (return_status != 0):
+			errors = errors + 1
+			type = "error"
+		if (total_seconds > 10 and return_status == 0):
+			slow = slow + 1
+			type = "slow"
 		buf = bytearray(open(chosen_file_name, 'rb').read())
-		error_file_name = chosen_file_name+"."+str(return_status)+"."+str(round(total_seconds))+"s.html"
+		error_file_name = chosen_file_name
+		error_file_name = error_file_name + "." + type + "." + str(return_status)
+		error_file_name = error_file_name + "." + "t"+str(round(total_seconds)).zfill(4) + "s"
+		error_file_name = error_file_name + "." + "it"+str(i).zfill(4)
+		error_file_name = error_file_name + ".html"
 		open(error_file_name, 'wb').write(buf)
 		print('Crashed: '+str(return_status)+'. Temps: '+str(total_seconds)+'s '+error_file_name)
 	t = datetime.datetime.now()
-	print("Iteracions: "+str(i)+"; errors: "+str(errors)+"; temps: "+str(round((t-t0).total_seconds()/60))+"min");
+	msg = "Iteracions: "+str(i).zfill(4)
+	msg = msg + "; errors: "+str(errors)
+	msg = msg + "; lents: "+str(slow).zfill(4)
+	msg = msg + "; temps: "+str(total_seconds)+"s"
+	msg = msg + "; total: "+str(round((t-t0).total_seconds()/60))+"min"
+	print(msg);
 	process.terminate()
