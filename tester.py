@@ -64,7 +64,7 @@ for i in range(num_tests):
 		if (total_seconds > 10 and return_status == 0):
 			slow = slow + 1
 			type = "slow"
-		buf = bytearray(open(chosen_file_name, 'rb').read())
+		buf = bytearray(open(temp_file_name, 'rb').read())
 		error_file_name = chosen_file_name
 		error_file_name = error_file_name + "." + type + "." + str(return_status)
 		error_file_name = error_file_name + "." + "t"+str(round(total_seconds)).zfill(4) + "s"
